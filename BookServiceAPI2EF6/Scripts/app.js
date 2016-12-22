@@ -4,8 +4,18 @@ var ViewModel = function () {
     self.books = ko.observableArray();
     self.error = ko.observable();
     self.detail = ko.observable();
+    self.autors = ko.observableArray();
+
+    self.newBook = {
+        Author: ko.observable(),
+        Genre: ko.observable(),
+        Price: ko.observable(),
+        Title: ko.observable(),
+        Year: ko.observable()
+    }
 
     var booksUri = '/api/books/';
+    var authorsUri = '/api/authors'
 
     function ajaxHelper(uri, method, data) {
         self.error(''); // Clear error message
@@ -32,8 +42,29 @@ var ViewModel = function () {
         });
     }
 
+    function getAuthors() {
+        ajaxHelper(authorsUri, 'GET').done(function (data) {
+            self.books(data);
+        });
+    }
+
+    self.addBook = function (formElement) {
+        var book = {
+            AuthorId: self.newBook.Author().Id,
+            Genre: self.newBook.Genre,
+            Price: self.newBook.Price,
+            Title: self.newBook.Title,
+            Year: self.newBook.Year
+        };
+
+        ajaxHelper(booksUri, 'POST', book).done(function (item) {
+            self.books.push(item);
+        });
+    }
+
     // Fetch the initial data.
     getAllBooks();
+    getAuthors();
 
 };
 
